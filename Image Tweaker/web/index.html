@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Image Tweaker</title>
+
+
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="web-css/index.css" />
+      <link rel="stylesheet" href="web-css/reposition.css" />
+  <style>
+    body {font-family: Arial, Helvetica, sans-serif;}
+
+    /* The Modal (background) */
+    .modal {
+      display: none; /* Hidden by default */
+      position: fixed; /* Stay in place */
+      z-index: 1; /* Sit on top */
+      padding-top: 100px; /* Location of the box */
+      left: 0;
+      top: 0;
+      width: 100%; /* Full width */
+      height: 100%; /* Full height */
+      overflow: auto; /* Enable scroll if needed */
+      background-color: rgb(0,0,0); /* Fallback color */
+      background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    }
+
+    /* Modal Content */
+    .modal-content {
+      background-color: #fefefe;
+      margin: auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%;
+    }
+
+    /* The Close Button */
+    .close {
+      color: #aaaaaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+      color: #000;
+      text-decoration: none;
+      cursor: pointer;
+    }
+  </style>
+  </head>
+  <body>
+    <div class="content-wrapper">
+        <div class="btns-wrapper">
+            <button class="btn btn-primary" onclick="onGraySwitchClick()">Gray Scale</button>
+
+            <button id="myBtn" class="btn btn-primary">Image Properties</button>
+
+            <!-- The Modal -->
+            <div id="myModal" class="modal">
+
+              <!-- Modal content -->
+              <div class="modal-content">
+                <span class="close">&times;</span>
+                <pre id="img-props"></pre>
+              </div>
+
+            </div>
+
+
+
+            <div class="form">
+              <label>
+                <input type="number" placeholder="Tx" class="text-input form-control" id="tx">
+                <input type="number" placeholder="Ty" class="text-input form-control" id="ty">
+              </label>
+               <button onclick="onTranslateClick()" class="btn btn-primary" title="Translate image over x or y axis">Translate</button>
+            </div>
+
+            <input type="number" placeholder="Angle" class="text-input form-control" id="angle" />
+            <button class="btn btn-primary" onclick="onRotateClick()" title="Rotate Image to any angle you specify">Rotate</button><br>
+
+            <input type="number" placeholder="Skew Value" class="text-input form-control" id="skew-value" />
+            <button class="btn btn-primary" onclick="onSkewClick()">Skew</button>
+            <button class="btn btn-primary" onclick="onDeskewClick()">Deskew</button>
+            <button class="btn btn-primary" onclick="onZoomClick()" title="Zoom image using your mouse ">Zoom</button>
+
+            <div class="flipping-axis">
+                <select class="form-select selection" aria-label="Default select example" id="axisSelect">
+                  <option selected>Axis</option>
+                  <option value="x">x</option>
+                  <option value="y">y</option>
+                  <option value="both">x & y</option>
+                </select>
+                <button onclick="onFlipClick()" class="btn btn-primary">Flip</button>
+            </div>
+            <button onclick="onBlindClick()" class="btn btn-primary">Blind</button>
+
+            <button id="histoBtn" class="btn btn-primary">Histo</button>
+            <button onclick="onEqualizeClick()" class="btn btn-primary">Equalize</button>
+
+            <!-- The Modal -->
+            <div id="histoModal" class="modal">
+
+              <!-- Modal content -->
+              <div class="modal-content">
+                <span class="close">&times;</span>
+                <pre id="histogram"></pre>
+              </div>
+
+            </div>
+
+                <div class="flipping-axis">
+                    <input type="text" id="powerSelect" class="form-control" placeholder="Gamma power" />
+                <button onclick="onGammaCorrectClick()" class="btn btn-primary">Power</button>
+            </div>
+
+            <button onclick="onLinearTransformClick()" class="btn btn-primary">Linear Transform</button>
+            <button onclick="onLogTransformClick()" class="btn btn-primary">Log Transform</button>
+            <button onclick="onClarifyClick()" class="btn btn-primary">Gray Slice</button>
+            <button onclick="onCompressClick()" class="btn btn-primary">Compress</button>
+            <button onclick="onShowPlanesClick()" class="btn btn-primary">Planes</button>
+            <div class="flipping-axis">
+                <select class="form-select selection" aria-label="Default select example" id="filterSelect">
+                  <option selected>Type</option>
+                  <option value="Gauss">Gauss</option>
+                  <option value="Average">Average</option>
+                  <option value="Circular">Circular</option>
+                  <option value="Pyramidal">Pyramidal</option>
+                  <option value="Cone">Cone</option>
+                  <option value="Median">Median</option>
+                </select>
+                <input type="number" id="area-to-filter" class="form-control" placeholder="Area Range" title="Specify range of pixels in image to filter.
+                Like: image[y:y+50, x:x+50], 50 is your input." />
+                <button onclick="onFilterClick()" class="btn btn-primary">Filter</button>
+            </div>
+            <div class="flipping-axis">
+                <select class="form-select selection" aria-label="Default select example" id="sobelFilterSelect">
+                  <option selected>Sobel</option>
+                  <option value="Horizontal">Horizontal</option>
+                  <option value="Vertical">Vertical</option>
+                  <option value="Combined">Combined</option>
+                </select>
+                <button onclick="onSobelFilteredClick()" class="btn btn-primary">Filter</button>
+                <button onclick="onLaplaceClick()" class="btn btn-primary">Laplace</button>
+            </div>
+                <button onclick="onSegmentClick()" class="btn btn-primary">Segment</button>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            <div style="display: flex;flex-direction: row; position: absolute;bottom: 0">
+                <button class="btn btn-primary" onclick="onUndoClick()">Undo</button>
+                <button class="btn btn-primary" onclick="onRedoClick()">Redo</button>
+                <button class="btn btn-primary" onclick="onResetClick()">Reset</button>
+            </div>
+
+        </div>
+        <div id="image-area">
+            <div id="uplBtn-wrapper">
+                <button style="float: top;" class="btn btn-primary" onclick="getPathToFile()">Select File</button>
+            </div>
+            <div id="first-image-wrapper">
+
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <script type="text/javascript" src="/eel.js">
+
+    </script>
+    <script type="text/javascript">
+
+
+      function onGraySwitchClick(){
+        eel.switch_to_grayed();  // we call exposed python functions in the javascript just like this one and the rest of the same followings in whole javascript code.
+        document.getElementById("image").src = path
+          // getting the image that got override (when an operation is done on image, the image is overridden with the edited one)
+      }
+
+      function onImgDataGet(){
+        console.log("Hello World")
+        eel.show_image_data();
+      }
+
+      eel.expose(getImageData)
+      function getImageData(imageProps){
+          // exposing this function to python to be called from python so modal will be shown when
+          // image properties button is clicked.
+        console.log(imageProps)
+        let imgData = document.getElementById("img-props");
+        let data = "";
+        for(let info of imageProps){
+          data += `${info}\n`
+        }
+        imgData.innerHTML = data;
+      }
+
+      function onTranslateClick(event){
+        const tx = document.getElementById("tx").value;
+        const ty = document.getElementById("ty").value;
+        // getting values of tx, ty that user entered for translating the image.
+        console.log(tx, ty)
+        eel.translate_image(tx, ty);
+        document.getElementById("image").src = path
+
+      }
+
+
+      function onRotateClick(){
+          const angle = document.getElementById("angle").value;
+          eel.rotate_image(angle)
+          document.getElementById("image").src = path
+      }
+
+
+      function onSkewClick(){
+          let skewValue = document.getElementById("skew-value").value;
+          eel.skew_image(skewValue);
+          document.getElementById("image").src = path
+      }
+
+      function onDeskewClick(){
+          let skewValue = document.getElementById("skew-value").value;
+          eel.deskew_image(skewValue);
+          document.getElementById("image").src = path
+      }
+
+      function onZoomClick(){
+          let zoom_area = prompt("Enter length to zoom image as square. (200 for example will show 200px*200px square zoomed image)")
+          eel.zoom_image(zoom_area);
+          document.getElementById("image").src = path
+      }
+
+      function onFlipClick(){
+        let e = document.getElementById("axisSelect");
+        let axisText = e.options[e.selectedIndex].text; // getting axis value that user selected.
+        eel.flip_image(axisText);
+        document.getElementById("image").src = path
+      }
+
+
+      function onBlindClick(){
+          eel.blind_image();
+          document.getElementById("image").src = path
+      }
+
+
+      function displayHistoImage(){
+          document.getElementById("histogram").innerHTML = `
+            <img src="images/histogram.png" />
+          `
+      }
+
+      function onEqualizeClick(){
+          eel.equalize_image()
+          document.getElementById("image").src = path
+      }
+
+      function onGammaCorrectClick(){
+          let gammaPowerValue = document.getElementById("powerSelect").value;
+          eel.correct_gama(gammaPowerValue);
+          document.getElementById("image").src = path
+      }
+
+
+      function onLinearTransformClick(){
+          eel.transform_linear()
+          document.getElementById("image").src = path
+      }
+
+      function onLogTransformClick(){
+          eel.log_transform()
+          document.getElementById("image").src = path
+      }
+      function onClarifyClick(){
+          eel.slice_gray_level()
+          document.getElementById("image").src = path
+      }
+      function onCompressClick(){
+          eel.compress()
+          document.getElementById("image").src = path
+      }
+      function onShowPlanesClick(){
+          eel.show_compress_planes()
+          document.getElementById("image").src = path
+      }
+      function onFilterClick(){
+          let e = document.getElementById("filterSelect");
+          let filterType = e.options[e.selectedIndex].text; // getting filter type that user selected.
+          let pixelsArea = document.getElementById("area-to-filter").value;
+          console.log("Pixels Area", pixelsArea)
+          eel.filter_image(filterType, pixelsArea);
+          document.getElementById("image").src = path
+      }
+      eel.expose(showFilterBlurredImage)
+      function showFilterBlurredImage(){
+          document.getElementById("image").src = path;
+      }
+
+      function onSobelFilteredClick(){
+          let e = document.getElementById("sobelFilterSelect");
+          let sobelFilterType = e.options[e.selectedIndex].text; // getting sobel filter type that user selected.
+          eel.filter_sobel(sobelFilterType);
+          document.getElementById("image").src = path
+      }
+
+      function onLaplaceClick(){
+          eel.filter_laplace()
+          document.getElementById("image").src = path
+      }
+
+       function onSegmentClick(){
+
+          eel.segment()
+           document.getElementById("image").src = path
+       }
+
+
+
+
+
+      function onUndoClick(){
+          eel.undo_image();
+          document.getElementById("image").src = path
+      }
+
+      function onRedoClick(){
+          eel.redo_image();
+          document.getElementById("image").src = path
+      }
+
+      function onResetClick(){
+          eel.reset_image();
+          document.getElementById("image").src = path
+      }
+
+
+
+
+
+
+
+
+
+
+
+      // Logic of displaying modal for showing image properties
+            // Get the modal
+        let modal = document.getElementById("myModal");
+
+        // Get the button that opens the modal
+        let btn = document.getElementById("myBtn");
+
+        // Get the <span> element that closes the modal
+        let span = document.getElementsByClassName("close")[0];
+
+        // When the user clicks the button, open the modal
+        btn.onclick = function() {
+          modal.style.display = "block";
+          onImgDataGet();
+        }
+
+        // When the user clicks on <span> (x), close the modal
+        span.onclick = function() {
+          modal.style.display = "none";
+        }
+
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function(event) {
+          if (event.target == modal) {
+            modal.style.display = "none";
+          }
+        }
+
+
+
+        // Logic of displaying modal for showing image properties
+            // Get the modal
+        let histoModal = document.getElementById("histoModal");
+
+        // Get the button that opens the modal
+        let histoBtn = document.getElementById("histoBtn");
+
+        // Get the <span> element that closes the modal
+        let histoSpan = document.getElementsByClassName("close")[1];
+
+        // When the user clicks the button, open the modal
+        histoBtn.onclick = function() {
+          histoModal.style.display = "block";
+            eel.display_histogram();
+          displayHistoImage()
+        }
+
+        // When the user clicks on <span> (x), close the modal
+        histoSpan.onclick = function() {
+          histoModal.style.display = "none";
+        }
+
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function(event) {
+          if (event.target == histoModal) {
+            histoModal.style.display = "none";
+          }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // logic of displaying image after select_file button is clicked and image is selected.
+        let path = "";
+        let img_wrapper = document.getElementById("first-image-wrapper");
+        function getPathToFile() {
+            eel.get_image()((r) => {
+                embedImage(r)
+            });
+        }
+        function embedImage(r){
+            path = `images/${r}`
+            console.log(r)
+            if(r !== null){
+                img_wrapper.innerHTML = `
+                    <img src=${path} alt="Image" id="image" onload="onImageLoad()"/>
+                `
+                // width="860" height="900"
+            }
+        }
+
+        function onImageLoad(){
+            let image = document.getElementById("image");
+            if(image.naturalHeight > 900){
+                image.style.height = "300px";
+            } else if(image.naturalWidth > 860){
+                image.style.width = "300px";
+            }
+        }
+
+    </script>
+
+      <script src="js/bootstrap.min.js"></script>
+  </body>
+</html>
